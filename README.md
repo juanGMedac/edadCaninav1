@@ -31,15 +31,15 @@ Al terminar sabrás:
 
 Antes de arreglar nada, comprueba qué falla. Prueba estas entradas y anota qué pasa:
 
-| Entrada | ¿Qué ocurre? |
-|---|---|
-| *(campo vacío)* | |
-| `abc` | |
-| `3.5` | |
-| `0` | |
-| `-4` | |
-| `99999999999` | |
-| `400000000` | |
+| Entrada | ¿Qué ocurre?                    |
+|---|---------------------------------|
+| *(campo vacío)* | la apliacion se cierra          |
+| `abc` | la apliacion se cierra          |
+| `3.5` | la apliacion se cierra          |
+| `0` | Pone edad 0                     |
+| `-4` | Pone -28                        |
+| `99999999999` | la apliacion se cierra          |
+| `400000000` | Aparecen los numero -1494967296 |
 
 > 💡 Cuando la app se cierre, abre el **Logcat** y busca la excepción. ¿Qué método la lanza? ¿Por qué el último caso no cierra la app pero da un resultado absurdo?
 
@@ -72,6 +72,21 @@ En `res/values/strings.xml` añade tres textos nuevos:
 ```
 
 > ❓ ¿Qué significan `%1$d` y `%2$d`? ¿En qué orden se rellenan?
+
+%1$d y %2$d son marcadores de posición (placeholders) con formato de cadena de Android/Java. Se sustituyen por valores reales cuando usas el texto desde el código.
+
+Qué significa cada parte:
+
+% → indica el inicio del marcador.
+1$ / 2$ → la posición del argumento que se va a insertar (1 = primer argumento, 2 = segundo).
+d → el tipo de dato: entero decimal (decimal integer).
+
+¿En qué orden se rellenan?
+
+Se rellenan según el número que llevan, no según el orden en que aparecen en el texto:
+
+%1$d → recibe el primer argumento que pases.
+%2$d → recibe el segundo argumento.
 
 ## Paso 5 · Restringe la entrada desde el layout
 
@@ -121,7 +136,9 @@ ageEdit = findViewById(R.id.age_input);
 resultText = findViewById(R.id.result_text);
 ```
 
-> ❓ ¿Qué pasaría si dejaras `EditText ageEdit = findViewById(...)` dentro de `onCreate()`?
+> ❓ ¿Qué pasaría si dejaras `EditText ageEdit = findViewById(...)` dentro de `onCreate()`?ç
+
+Si dejo EditText ageEdit = findViewById(...) dentro de onCreate(), declaro una variable local nueva con el mismo nombre que el atributo de la clase, lo que se conoce como shadowing (ocultación). La variable local se inicializa correctamente, pero el atributo ageEdit de la clase nunca llega a asignarse y permanece en null.
 
 ## Paso 8 · Saca la lógica del botón a un método
 
@@ -157,6 +174,8 @@ Implementa el método siguiendo este orden. En cuanto algo falle, llama a `mostr
 5. **Todo correcto**: quita el error del campo (`setError(null)`), calcula `age * FACTOR_CANINO` y muestra el resultado con `tu_edad_format`.
 
 > ❓ ¿Por qué limitar la edad a 30 evita también el desbordamiento que viste en el Paso 1?
+
+limitar la edad a 30 evita el desbordamiento porque age * FACTOR_CANINO nunca puede superar el máximo de un int (≈ 2.147 millones). Con 30 × 7 = 210 el resultado es minúsculo, mientras que sin límite, una edad enorme como 2000000000 daría un resultado que “da la vuelta” y se convierte en un número negativo o incorrecto.
 
 ## Paso 11 · Vuelve a probar
 
